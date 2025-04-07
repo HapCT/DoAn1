@@ -1,0 +1,16 @@
+D:\DoAn1(Win)\DoAn\DoAn\DoAn\bin\Debug\DoAn.exe.config
+D:\DoAn1(Win)\DoAn\DoAn\DoAn\bin\Debug\DoAn.exe
+D:\DoAn1(Win)\DoAn\DoAn\DoAn\bin\Debug\DoAn.pdb
+D:\DoAn1(Win)\DoAn\DoAn\DoAn\bin\Debug\MetroFramework.Design.dll
+D:\DoAn1(Win)\DoAn\DoAn\DoAn\bin\Debug\MetroFramework.dll
+D:\DoAn1(Win)\DoAn\DoAn\DoAn\bin\Debug\MetroFramework.Fonts.dll
+D:\DoAn1(Win)\DoAn\DoAn\DoAn\obj\Debug\DoAn.csproj.AssemblyReference.cache
+D:\DoAn1(Win)\DoAn\DoAn\DoAn\obj\Debug\DoAn.Properties.Resources.resources
+D:\DoAn1(Win)\DoAn\DoAn\DoAn\obj\Debug\DoAn.csproj.GenerateResource.cache
+D:\DoAn1(Win)\DoAn\DoAn\DoAn\obj\Debug\DoAn.csproj.CoreCompileInputs.cache
+D:\DoAn1(Win)\DoAn\DoAn\DoAn\obj\Debug\DoAn.csproj.Up2Date
+D:\DoAn1(Win)\DoAn\DoAn\DoAn\obj\Debug\DoAn.exe
+D:\DoAn1(Win)\DoAn\DoAn\DoAn\obj\Debug\DoAn.pdb
+D:\DoAn1(Win)\DoAn\DoAn\DoAn\obj\Debug\DoAn.frmDangky.resources
+D:\DoAn1(Win)\DoAn\DoAn\DoAn\obj\Debug\DoAn.DangNhap.resources
+D:\DoAn1(Win)\DoAn\DoAn\DoAn\obj\Debug\DoAn.HoSo.resources

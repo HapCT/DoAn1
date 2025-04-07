@@ -1,139 +1,179 @@
-﻿CREATE DATABASE TruongMnBinhMinh;
-USE TruongMnBinhMinh;
-GO
+﻿CREATE DATABASE TruongMamNonBinhMinh;
+USE TruongMamNonBinhMinh;
 
--- 1. Bảng Trường
-CREATE TABLE Truong (
-    MaTruong INT PRIMARY KEY IDENTITY(1,1),
-    TenTruong NVARCHAR(255) NOT NULL,
-    DiaChi NVARCHAR(255),
-    SoDienThoai VARCHAR(10)
-);
-
--- 2. Bảng Lớp (Thêm trạng thái để không cần xóa lớp)
-CREATE TABLE Lop (
-    MaLop INT IDENTITY(1,1) PRIMARY KEY,
-    TenLop NVARCHAR(100) NOT NULL,
-    DoTuoi INT CHECK (DoTuoi BETWEEN 3 AND 5),
-    MaTruong INT NOT NULL,
-    TrangThai NVARCHAR(50) DEFAULT N'Đang hoạt động' CHECK (TrangThai IN (N'Đang hoạt động', N'Đã hoàn thành')),
-    FOREIGN KEY (MaTruong) REFERENCES Truong(MaTruong) ON DELETE CASCADE
+-- Bảng Trường Học
+CREATE TABLE TruongHoc (
+    TruongID INT IDENTITY(1,1) PRIMARY KEY,
+    TenTruong VARCHAR(255) NOT NULL
 );
 
 
--- 3. Bảng Giáo Viên
-CREATE TABLE GiaoVien (
-    MaGV INT IDENTITY(1,1) PRIMARY KEY,
-    HoTen NVARCHAR(90) NOT NULL,
-    NgaySinh DATE,
-    GioiTinh NVARCHAR(10) CHECK (GioiTinh IN (N'Nam', N'Nữ')) NOT NULL,
-    SDT VARCHAR(10),
-    Email VARCHAR(100),
-    MaTruong INT NOT NULL,
-    FOREIGN KEY (MaTruong) REFERENCES Truong(MaTruong) ON DELETE CASCADE
-);
-
--- 4. Bảng Giáo Viên - Lớp (Cho phép giáo viên dạy nhiều lớp)
-CREATE TABLE GiaoVien_Lop (
-    MaGV INT NOT NULL,
-    MaLop INT NOT NULL,  
-    PRIMARY KEY (MaGV, MaLop),
-    FOREIGN KEY (MaGV) REFERENCES GiaoVien(MaGV) ON DELETE CASCADE,
-    FOREIGN KEY (MaLop) REFERENCES Lop(MaLop) ON DELETE NO ACTION
-);
-
-
--- 5. Bảng Học Sinh
-CREATE TABLE HocSinh (
-    MaHS INT PRIMARY KEY IDENTITY(1,1),
-    HoTen NVARCHAR(255) NOT NULL,
-    NgaySinh DATE NOT NULL,
-    GioiTinh NVARCHAR(10) CHECK (GioiTinh IN (N'Nam', N'Nữ')) NOT NULL,
-    MaLop INT,
-    MaTruong INT NOT NULL,  -- Giữ nguyên NOT NULL
-    FOREIGN KEY (MaLop) REFERENCES Lop(MaLop) ON DELETE SET NULL,
-    FOREIGN KEY (MaTruong) REFERENCES Truong(MaTruong) ON DELETE NO ACTION
-);
-
--- 6. Bảng Điểm Danh
-CREATE TABLE DiemDanh (
-    MaDiemDanh INT PRIMARY KEY IDENTITY(1,1),
-    MaHS INT NOT NULL,
-    NgayDiemDanh DATE NOT NULL,
-    TrangThai NVARCHAR(50) CHECK (TrangThai IN (N'Có mặt', N'Vắng', N'Nghỉ có phép', N'Nghỉ không phép')) NOT NULL,
-    DangKyAnBanTru BIT DEFAULT 0,
-    FOREIGN KEY (MaHS) REFERENCES HocSinh(MaHS) ON DELETE CASCADE
-);
-
--- 7. Bảng Học Phí
-CREATE TABLE HocPhi (
-    MaHocPhi INT PRIMARY KEY IDENTITY(1,1),
-    MaHS INT NOT NULL,
-    ThangNam DATE NOT NULL,
-    TienHoc DECIMAL(10,2) NOT NULL,
-    TienAn DECIMAL(10,2) NOT NULL,
-    TienHoatDong DECIMAL(10,2) NOT NULL,
-    TongTien AS (TienHoc + TienAn + TienHoatDong) PERSISTED,
-    TrangThaiThanhToan NVARCHAR(20) CHECK (TrangThaiThanhToan IN (N'Chưa thanh toán', N'Đã thanh toán')) DEFAULT N'Chưa thanh toán',
-    FOREIGN KEY (MaHS) REFERENCES HocSinh(MaHS) ON DELETE CASCADE
-);
-
--- 8. Bảng Báo Cáo Tài Chính
-CREATE TABLE BaoCaoTaiChinh (
-    MaBaoCao INT PRIMARY KEY IDENTITY(1,1),
-    ThangNam DATE NOT NULL,
-    TongTienHoc DECIMAL(10,2) NOT NULL,
-    TongTienAn DECIMAL(10,2) NOT NULL,
-    TongTienHoatDong DECIMAL(10,2) NOT NULL,
-    TongChiPhi DECIMAL(10,2) NOT NULL,
-    LoiNhuan AS (TongTienHoc + TongTienAn + TongTienHoatDong - TongChiPhi) PERSISTED,
-    MaTruong INT NOT NULL,
-    FOREIGN KEY (MaTruong) REFERENCES Truong(MaTruong) ON DELETE CASCADE
-);
-
--- 9. Bảng Lương Giáo Viên
-CREATE TABLE LuongGiaoVien (
-    MaLuong INT PRIMARY KEY IDENTITY(1,1),
-    MaGV INT NOT NULL,
-    ThangNam DATE NOT NULL,
-    LuongCoBan DECIMAL(10,2) NOT NULL,
-    PhuCap DECIMAL(10,2) NOT NULL,
-    TongLuong AS (LuongCoBan + PhuCap) PERSISTED,
-    FOREIGN KEY (MaGV) REFERENCES GiaoVien(MaGV) ON DELETE CASCADE
-);
-
--- 10. Bảng Phụ Huynh
-CREATE TABLE PhuHuynh (
-    MaPhuHuynh INT PRIMARY KEY IDENTITY(1,1),
-    HoTen NVARCHAR(100) NOT NULL,
-    SDT VARCHAR(15) NOT NULL,
+-- Bảng Người Dùng
+CREATE TABLE NguoiDung (
+    NguoiDungID INT IDENTITY(1,1) PRIMARY KEY,
+    HoTen VARCHAR(100),
     Email VARCHAR(100) UNIQUE,
-    DiaChi NVARCHAR(255),
-    MatKhau VARCHAR(255) NOT NULL,
-    MaHS INT UNIQUE,
-    FOREIGN KEY (MaHS) REFERENCES HocSinh(MaHS) ON DELETE CASCADE
+    MatKhau VARCHAR(255),
+    TruongID INT,
+    Vaitro NVARCHAR(5) CHECK(Vaitro IN ('Ban Giám Hiệu', 'Giáo viên', 'Phụ huynh', 'Nhân viên')),
+    FOREIGN KEY (TruongID) REFERENCES TruongHoc(TruongID) ON DELETE CASCADE
 );
-
--- 11. Bảng Tài Khoản (Quản lý đăng nhập và phân quyền)
-CREATE TABLE TaiKhoan (
-    MaTK INT PRIMARY KEY IDENTITY(1,1),
-    TenDangNhap NVARCHAR(90) UNIQUE NOT NULL,
-    MatKhau VARCHAR(255) NOT NULL,
-    LoaiTaiKhoan NVARCHAR(20) CHECK (LoaiTaiKhoan IN (N'Hiệu Trưởng', N'Giáo Viên', N'Phụ Huynh')) NOT NULL,
-    GiaoVienID INT NULL,
-    PhuHuynhID INT NULL,
-    MaTruong INT NOT NULL,
-    FOREIGN KEY (GiaoVienID) REFERENCES GiaoVien(MaGV) ON DELETE SET NULL,
-    FOREIGN KEY (PhuHuynhID) REFERENCES PhuHuynh(MaPhuHuynh) ON DELETE SET NULL,
-    FOREIGN KEY (MaTruong) REFERENCES Truong(MaTruong) ON DELETE NO ACTION -- Ngăn chặn xóa trường nếu còn tài khoản
+--Bảng Ban Giám Hiệu
+CREATE TABLE BanGiamHieu (
+    BanGiamHieuID INT IDENTITY(1,1) PRIMARY KEY,
+    NguoiDungID INT, -- Liên kết với bảng NguoiDung
+    ChucVu VARCHAR(100) CHECK(ChucVu IN('Hiệu trưởng', 'Phó hiệu trưởng')), -- Ví dụ: Hiệu trưởng, Phó hiệu trưởng
+    SoDienThoai VARCHAR(15),
+    DiaChi VARCHAR(255),
+    NgaySinh DATE,
+    GioiTinh NVARCHAR(5) CHECK(GioiTinh IN ('Nam', 'Nữ', 'Khác')),
+    FOREIGN KEY (NguoiDungID) REFERENCES NguoiDung(NguoiDungID) ON DELETE CASCADE
 );
 
 
--- 12. Bảng Lớp Lịch Sử (Lưu trữ lớp học đã xóa nếu cần)
-CREATE TABLE Lop_LichSu (
-    MaLop INT PRIMARY KEY,
-    TenLop NVARCHAR(100) NOT NULL,
-    DoTuoi INT,
-    MaTruong INT,
-    NgayKetThuc DATE DEFAULT GETDATE()
+-- Bảng Giáo Viên
+CREATE TABLE GiaoVien (
+    GiaoVienID INT IDENTITY(1,1) PRIMARY KEY,
+    NguoiDungID INT UNIQUE,
+    TruongID INT,
+    ChuyenMon VARCHAR(255),
+    KinhNghiem INT,
+    SoDienThoai VARCHAR(15),
+    DiaChi VARCHAR(255),
+    NgaySinh DATE,
+    GioiTinh NVARCHAR(5) CHECK(GioiTinh IN ('Nam', 'Nữ', 'Khác')),
+    FOREIGN KEY (NguoiDungID) REFERENCES NguoiDung(NguoiDungID) ON DELETE NO ACTION,
+    FOREIGN KEY (TruongID) REFERENCES TruongHoc(TruongID) ON DELETE NO ACTION
 );
+
+
+-- Bảng Nhân Viên
+CREATE TABLE NhanVien (
+    NhanVienID INT IDENTITY(1,1) PRIMARY KEY,
+    NguoiDungID INT UNIQUE,
+    TruongID INT,
+    ChucVu VARCHAR(255),
+    Luong DECIMAL(10,2),
+    SoDienThoai VARCHAR(15),
+    DiaChi VARCHAR(255),
+    NgaySinh DATE,
+    GioiTinh NVARCHAR(5) CHECK(GioiTinh IN ('Nam', 'Nữ', 'Khác')),
+    FOREIGN KEY (NguoiDungID) REFERENCES NguoiDung(NguoiDungID) ON DELETE NO ACTION,
+    FOREIGN KEY (TruongID) REFERENCES TruongHoc(TruongID) ON DELETE NO ACTION
+);
+
+-- Bảng Lớp Học
+CREATE TABLE LopHoc (
+    LopHocID INT IDENTITY(1,1) PRIMARY KEY,
+    TenLop VARCHAR(50) UNIQUE NOT NULL,
+	SiSo INT,
+    GiaoVienID INT,
+    TruongID INT,
+    FOREIGN KEY (GiaoVienID) REFERENCES GiaoVien(GiaoVienID) ON DELETE SET NULL,
+    FOREIGN KEY (TruongID) REFERENCES TruongHoc(TruongID) ON DELETE CASCADE
+);
+
+
+-- Bảng Học Sinh
+
+CREATE TABLE HocSinh (
+    HocSinhID INT IDENTITY(1,1) PRIMARY KEY,
+    HoTen VARCHAR(100),
+    NgaySinh DATE,
+    LopHocID INT,
+    PhuHuynhID INT,
+    TruongID INT,
+    TrangThaiDiemDanh NVARCHAR(50) CHECK (TrangThaiDiemDanh IN ('Có mặt', 'Vắng mặt', 'Nghỉ có phép')) DEFAULT 'Có mặt',
+    DangKyAnBanTru BIT DEFAULT 0, -- Sử dụng 0 thay vì FALSE
+    -- Sửa các ràng buộc khóa ngoại
+    FOREIGN KEY (LopHocID) REFERENCES LopHoc(LopHocID) ON DELETE CASCADE,  -- Xóa học sinh khi lớp học bị xóa
+    FOREIGN KEY (PhuHuynhID) REFERENCES NguoiDung(NguoiDungID) ON DELETE NO ACTION,  -- Thay đổi thành NO ACTION thay vì SET NULL
+    FOREIGN KEY (TruongID) REFERENCES TruongHoc(TruongID) ON DELETE NO ACTION -- Khi trường bị xóa, không làm gì với học sinh
+);
+
+--Bảng phụ huynh
+CREATE TABLE PhuHuynh (
+    PhuHuynhID INT IDENTITY(1,1) PRIMARY KEY,
+    NguoiDungID INT,
+    SoDienThoai VARCHAR(15),
+    DiaChi VARCHAR(255),
+    FOREIGN KEY (NguoiDungID) REFERENCES NguoiDung(NguoiDungID) ON DELETE CASCADE
+);
+
+
+
+
+
+
+
+-- Bảng Lịch Sử Điểm Danh
+CREATE TABLE LichSuDiemDanh (
+    LichSuDiemDanhID INT IDENTITY(1,1) PRIMARY KEY,
+    HocSinhID INT,
+    Ngay DATE DEFAULT GETDATE(),  -- Thay CURRENT_DATE bằng GETDATE()
+    TrangThaiDiemDanh NVARCHAR(50) CHECK (TrangThaiDiemDanh IN ('Có mặt', 'Vắng mặt', 'Nghỉ có phép')) DEFAULT 'Có mặt',
+    FOREIGN KEY (HocSinhID) REFERENCES HocSinh(HocSinhID) ON DELETE CASCADE
+);
+
+
+-- Bảng Học Phí
+CREATE TABLE HocPhi (
+    HocPhiID INT IDENTITY(1,1) PRIMARY KEY,
+    HocSinhID INT,
+    SoTien DECIMAL(10,2),
+    NoiDung VARCHAR(255),
+    NgayDong DATE,
+    AnBanTru BIT DEFAULT 0,
+    FOREIGN KEY (HocSinhID) REFERENCES HocSinh(HocSinhID) ON DELETE CASCADE
+);
+
+-- Bảng Lương Giáo Viên
+CREATE TABLE LuongGiaoVien (
+    LuongGiaoVienID INT IDENTITY(1,1) PRIMARY KEY,
+    GiaoVienID INT,
+    ThangNam DATE,
+    SoTien DECIMAL(10,2),
+    FOREIGN KEY (GiaoVienID) REFERENCES GiaoVien(GiaoVienID) ON DELETE CASCADE
+);
+
+-- Bảng Chi Phí Trường
+CREATE TABLE ChiPhiTruong (
+    ChiPhiTruongID INT IDENTITY(1,1) PRIMARY KEY,
+    TruongID INT,
+    Ngay DATE,
+    NoiDung VARCHAR(255),
+    SoTien DECIMAL(10,2),
+    FOREIGN KEY (TruongID) REFERENCES TruongHoc(TruongID) ON DELETE CASCADE
+);
+
+-- Bảng Thống Kê Tài Chính
+CREATE TABLE ThongKeTaiChinh (
+    ThongKeTaiChinhID INT IDENTITY(1,1) PRIMARY KEY,
+    TruongID INT,
+    Ngay DATE,
+    ThuNhap DECIMAL(10,2),
+    ChiPhi DECIMAL(10,2),
+    LoiNhuan DECIMAL(10,2),
+    FOREIGN KEY (TruongID) REFERENCES TruongHoc(TruongID) ON DELETE CASCADE
+);
+
+-- Bảng Lưu Thông Tin Đã Xóa
+CREATE TABLE DuLieuDaXoa (
+    DuLieuDaXoaID INT IDENTITY(1,1) PRIMARY KEY,
+    TruongID INT,
+    NguoiDungID INT,
+    HoTen VARCHAR(100),
+    NgaySinh DATE NULL,
+    ChuyenMon VARCHAR(255) NULL,
+    KinhNghiem INT NULL,
+    SoDienThoai VARCHAR(15) NULL,
+    DiaChi VARCHAR(255) NULL,
+    GioiTinh NVARCHAR(5) CHECK(GioiTinh IN ('Nam', 'Nữ', 'Khác')),
+    LopID INT NULL,
+    NgayXoa DATETIME DEFAULT GETDATE(),  -- Thay đổi TIMESTAMP thành DATETIME và dùng GETDATE()
+    FOREIGN KEY (NguoiDungID) REFERENCES NguoiDung(NguoiDungID),
+    FOREIGN KEY (TruongID) REFERENCES TruongHoc(TruongID) ON DELETE CASCADE
+);
+
+
+

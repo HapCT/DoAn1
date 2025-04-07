@@ -1,0 +1,25 @@
+CREATE DATABASE TruongMamnonBM
+USE TruongMamnonBM
+CREATE TABLE TaiKhoan
+(
+	TaiKhoanID INT PRIMARY KEY,
+	TenDangNhap VARCHAR(30),
+	MatKhau VARCHAR(30),
+	LoaiTaiKhoan NVARCHAR(30),
+	CHECK (LoaiTaiKhoan 
+)
+CREATE TABLE Lop
+(
+	LopID INT PRIMARY KEY,
+	Lop NVARCHAR(30),
+	SiSo INT
+)
+CREATE TABLE DuLieuDaXoa
+(
+	
+)
+
+CREATE TABLE HocSinh
+(
+	HocSinhID 
+)
